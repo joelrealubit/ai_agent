@@ -15,11 +15,26 @@ def run_python_file(working_directory: str, file_path: str, args: list[str] | No
         if not extension == '.py':
             return f'Error: "{file_path}" is not a Python file'
         
+        command = ["python", target_file]
+        command.extend(args)
+        completed_proc = subprocess.run(command, capture_output=True, text=True, timeout=30000)
+        ret_str =""
+        if completed_proc.returncode not == 0:
+            ret_str+=f"Process Exited with code {completed_proc.returncode}\n"
+        if completed_proc.stdout == None and completed_proc.stderr == None:
+            retstr+=f"No output produced\n"
+        ret_str+=f"STDOUT: {completed_proc.stdout}\n"
+        ret_str+=f"STDERR: {completed_proc.stderr}\n"
+        return ret_str
+
+        
     except FileNotFoundError:
         return (f"Error: The file at {file_path} could not be found.")
     except PermissionError:
         return ("Error: You do not have permissions to access this file.")
     except TypeError:
         return ("Error: Provided path must be a string or bytes-like object.")
+    except Exception as e:
+        return f"Error: executing Python file: {e}"
                 
         
